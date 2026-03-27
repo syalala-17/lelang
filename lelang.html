@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+
+<style>
+
+body{
+font-family:Arial;
+max-width:500px;
+margin:auto;
+}
+
+input,textarea,select{
+width:100%;
+padding:8px;
+margin:5px 0;
+}
+
+button{
+padding:10px;
+background:#1a73e8;
+color:white;
+border:none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>Form Bid Lelang</h2>
+
+<h3>Data Bidder</h3>
+
+<input id="nama" placeholder="Nama">
+<input id="wa" placeholder="No WhatsApp">
+<input id="email" placeholder="Email">
+
+<h3>Penawaran</h3>
+
+<input id="id_produk" placeholder="ID Produk">
+<input id="bid" type="number" placeholder="Harga Bid">
+
+<h3>Lokasi Ongkir</h3>
+
+<input id="provinsi" placeholder="Provinsi">
+<input id="kota" placeholder="Kabupaten / Kota">
+
+<select id="kurir">
+<option value="jne">JNE</option>
+<option value="jnt">J&T</option>
+</select>
+
+<h3>Alamat Lengkap</h3>
+
+<textarea id="alamat" placeholder="Jl / Gang / No Rumah / RT RW"></textarea>
+
+<input id="kecamatan" placeholder="Kecamatan">
+<input id="desa" placeholder="Kelurahan / Desa">
+<input id="kodepos" placeholder="Kode Pos">
+
+<h3>Pengiriman</h3>
+
+<input id="berat" type="number" placeholder="Berat (gram)">
+
+<button onclick="cekOngkir()">Cek Ongkir</button>
+
+<p id="ongkir"></p>
+
+<button onclick="submitBid()">Submit Bid</button>
+
+<script>
+
+let ongkirValue=0;
+
+async function cekOngkir(){
+
+let berat=document.getElementById("berat").value;
+
+let res=await fetch("API_ONGKIR");
+
+let data=await res.json();
+
+ongkirValue=data.data.costs[0].cost[0].value;
+
+document.getElementById("ongkir").innerHTML=
+"Estimasi ongkir: Rp "+ongkirValue;
+
+}
+
+async function submitBid(){
+
+let bid=document.getElementById("bid").value;
+
+let data={
+
+nama:document.getElementById("nama").value,
+wa:document.getElementById("wa").value,
+email:document.getElementById("email").value,
+id_produk:document.getElementById("id_produk").value,
+provinsi:document.getElementById("provinsi").value,
+kota:document.getElementById("kota").value,
+alamat:document.getElementById("alamat").value,
+kecamatan:document.getElementById("kecamatan").value,
+desa:document.getElementById("desa").value,
+kodepos:document.getElementById("kodepos").value,
+kurir:document.getElementById("kurir").value,
+bid:bid,
+ongkir:ongkirValue,
+total:Number(bid)+Number(ongkirValue)
+
+};
+
+await fetch("URL_APPS_SCRIPT",{
+method:"POST",
+body:JSON.stringify(data)
+});
+
+alert("Bid berhasil dikirim");
+
+}
+
+</script>
+
+</body>
+</html>
